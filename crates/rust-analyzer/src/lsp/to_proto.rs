@@ -760,6 +760,8 @@ pub(crate) fn semantic_tokens(
                 {
                     continue;
                 }
+                // Always send AttributeBracket tokens, even without modifiers
+                HlTag::AttributeBracket => (),
                 _ => (),
             }
         }
