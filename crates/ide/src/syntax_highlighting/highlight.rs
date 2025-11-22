@@ -114,6 +114,15 @@ fn punctuation(
     let operator_parent = token.parent();
     let parent_kind = operator_parent.as_ref().map_or(EOF, SyntaxNode::kind);
 
+    // DEBUG: Print info for brackets in attributes
+    if matches!(kind, T!['['] | T![']']) {
+        eprintln!("BRACKET DEBUG: token={:?}, parent_kind={:?}, ancestors={:?}",
+            token.text(),
+            parent_kind,
+            token.parent_ancestors().map(|n| n.kind()).collect::<Vec<_>>()
+        );
+    }
+
     match (kind, parent_kind) {
         (T![?], TRY_EXPR) => HlTag::Operator(HlOperator::Other) | HlMod::ControlFlow,
         (T![&], BIN_EXPR) => HlOperator::Bitwise.into(),
@@ -167,7 +176,13 @@ fn punctuation(
         (T![>] | T![<] | T![==] | T![>=] | T![<=] | T![!=], BIN_EXPR) => {
             HlOperator::Comparison.into()
         }
-        (_, ATTR) => HlTag::AttributeBracket.into(),
+        (_, ATTR) => {
+            let result = HlTag::AttributeBracket.into();
+            if matches!(kind, T!['['] | T![']']) {
+                eprintln!("ATTR match! token={:?}, returning AttributeBracket", token.text());
+            }
+            result
+        }
         (T![>], _)
             if operator_parent
                 .as_ref()

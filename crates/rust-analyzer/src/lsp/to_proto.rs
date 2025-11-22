@@ -775,6 +775,14 @@ pub(crate) fn semantic_tokens(
             };
             mods.standard_fallback();
         }
+        // DEBUG: Log AttributeBracket tokens being sent
+        if matches!(highlight_range.highlight.tag, HlTag::AttributeBracket) {
+            eprintln!("LSP: Sending AttributeBracket token at range={:?}, text={:?}",
+                highlight_range.range,
+                &text[highlight_range.range]
+            );
+        }
+
         let token_index = semantic_tokens::type_index(ty);
         let modifier_bitset = mods.0;
 
